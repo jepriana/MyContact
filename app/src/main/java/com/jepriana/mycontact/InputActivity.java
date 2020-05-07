@@ -35,7 +35,6 @@ public class InputActivity extends AppCompatActivity {
     private CircleImageView imgProfilePicture;
     private String imgLocation;
     private boolean updateOperation = false;
-    private boolean defaultImage = true;
     private String gender;
     private int id = 0;
 
@@ -61,7 +60,6 @@ public class InputActivity extends AppCompatActivity {
             updateOperation = false;
         } else {
             updateOperation = true;
-            defaultImage = false;
             id = data.getInt("ID");
             editFirstName.setText(data.getString("FIRST_NAME"));
             editLastName.setText(data.getString("LAST_NAME"));
@@ -134,13 +132,17 @@ public class InputActivity extends AppCompatActivity {
         // Check which radio button was clicked
         switch(view.getId()) {
             case R.id.jekel_laki:
-                if (checked)
+                if (checked) {
                     gender = getString(R.string.gender_male);
+                    imgLocation = ApiClient.IMAGE_URL + "ava_boy.png";
                     break;
+                }
             case R.id.jekel_perempuan:
-                if (checked)
+                if (checked) {
                     gender = getString(R.string.gender_female);
+                    imgLocation = ApiClient.IMAGE_URL + "ava_girl.png";
                     break;
+                }
         }
     }
 
@@ -152,27 +154,13 @@ public class InputActivity extends AppCompatActivity {
         String lastName = editLastName.getText().toString();
         String number = editPhoneNumber.getText().toString();
         String email = editEmail.getText().toString();
-        String photo = "";
-        if(defaultImage==true) {
-            if(gender.equals(getString(R.string.gender_male))){
-                photo = ApiClient.IMAGE_URL + "ava_boy.png";
-            } else {
-                photo = ApiClient.IMAGE_URL + "ava_girl.png";
-            }
-        } else {
-            try {
-                photo = imgProfilePicture.getContentDescription().toString();
-            } catch (Exception er) {
-                er.printStackTrace();
-            }
-        }
         if(!(firstName.equals("") && lastName.equals("") && number.equals(""))) {
             ApiContact api = ApiClient.getRetrofitInstance().create(ApiContact.class);
             Call<ResponseData> call;
             if(updateOperation == false) {
-                call = api.addData(firstName, lastName, number, email, photo, gender);
+                call = api.addData(firstName, lastName, number, email, imgLocation, gender);
             } else {
-                call = api.editData(String.valueOf(id), firstName, lastName, number, email, photo, gender);
+                call = api.editData(String.valueOf(id), firstName, lastName, number, email, imgLocation, gender);
                 updateOperation = false;
             }
             call.enqueue(new Callback<ResponseData>() {
